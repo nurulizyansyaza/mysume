@@ -115,12 +115,12 @@
                             <li class="fw-bold alert alert-danger ff-montserrat small">{{ $message }}</li>
                         @endforeach
                     </ul>
-                @endif        
+                @endif
 
-                @if(session('status'))            
+                @if(session('status'))
                     <div class="fw-bold alert alert-success ff-montserrat py-3 small">{{ session('status') }}</div>
                 @endif
-                
+
                 {{-- register --}}
                 <form action="{{ url('register') }}" method="POST" id="formRegister">
                     @csrf
