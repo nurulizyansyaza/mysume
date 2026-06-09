@@ -25,11 +25,16 @@ class ResumeController extends Controller
 
     // Create new resume
     public function createNewResume(Request $request) {
+        $request->validate([
+            'title'    => 'required|string|max:255',
+            'template' => 'required|exists:templates,id',
+        ]);
+
         $title      = $request->title;
         $user_id    = auth()->user()->id;
         $template   = $request->template;
         $status     = 'Draft';
-        
+
         $resume                 = new Resume;
         $resume->title          = $title;
         $resume->user_id        = $user_id;
@@ -52,9 +57,9 @@ class ResumeController extends Controller
         if(count($jobs) > 0){
             foreach($jobs as $job){
                 $tasks = JobTask::where('job_id', $job->id)->get();
-                $tasks->each->delete();             
+                $tasks->each->delete();
                 $achievements = JobAchievement::where('job_id', $job->id)->get();
-                $achievements->each->delete(); 
+                $achievements->each->delete();
                 $job->delete();
             }
         }
@@ -63,13 +68,13 @@ class ResumeController extends Controller
         if(count($educations) > 0){
             foreach($educations as $education){
                 $achievements = EducationAchievement::where('education_id', $education->id)->get();
-                $achievements->each->delete();                      
+                $achievements->each->delete();
                 $education->delete();
             }
         }
 
         $resume->delete();
-        
+
         $request->session()->flash('success', 'Resume '.$title.' has been deleted.');
         return redirect()->route('home');
     }
@@ -83,7 +88,7 @@ class ResumeController extends Controller
         if($resume!=null) {
             $education  = Education::where('resume_id', $resume->id)->orderBy('start_year', 'DESC')->orderBy('start_month', 'DESC')->get();
             $job        = Job::where('resume_id', $resume->id)->orderBy('start_year', 'DESC')->orderBy('start_month', 'DESC')->get();
-            
+
             return view('resume.edit-resume')->with([
                 'resume'        => $resume,
                 'educations'    => $education,
@@ -100,12 +105,12 @@ class ResumeController extends Controller
     public function viewResume($username, $resume_id) {
         $user   = User::where('username', $username)->first();
         $resume = Resume::where('id', $resume_id)->first();
-        
+
         // jobs & educations in latest order when published
         if($user!=null && $resume!=null && $resume->status=='Published') {
             $education  = Education::where('resume_id', $resume->id)->orderBy('start_year', 'DESC')->orderBy('start_month', 'DESC')->get();
             $job        = Job::where('resume_id', $resume->id)->orderBy('start_year', 'DESC')->orderBy('start_month', 'DESC')->get();
-            
+
             return view('template.'.$resume->template->name)->with([
                 'resume'        => $resume,
                 'educations'    => $education,
@@ -147,12 +152,12 @@ class ResumeController extends Controller
         $data->currently_work   = 'on';
 
         $childCollection = collect();
-        
+
         $child              = new JobTask;
         $child->task_name   = 'Communicate and collaborate with multi-disciplinary teams of engineers, designers,
         producers, clients, and stakeholders on a daily basis';
         $childCollection->push($child);
-        
+
         $child              = new JobTask;
         $child->task_name   = 'Write modern, performant, and robust code for a diverse array of client and internal projects';
         $childCollection->push($child);
@@ -160,12 +165,12 @@ class ResumeController extends Controller
         $data->task = $childCollection;
 
         $childCollection = collect();
-        
+
         $child                      = new JobAchievement;
         $child->achievement_name    = 'Work with a variety of different languages, frameworks, and content management systems
         such as JavaScript, TypeScript, React, Vue, NativeScript, Node.js, Craft, Prismic, etc.';
         $childCollection->push($child);
-        
+
         $child                      = new JobAchievement;
         $child->achievement_name    = 'Helped solidify a brand direction for blistabloc to span across print, packaging, and web';
         $childCollection->push($child);
@@ -186,11 +191,11 @@ class ResumeController extends Controller
         $data->currently_work   = 0;
 
         $childCollection = collect();
-        
+
         $child              = new JobTask;
         $child->task_name   = 'Developed and shipped highly interactive web applications for Apple Music using Ember';
         $childCollection->push($child);
-        
+
         $child              = new JobTask;
         $child->task_name   = 'Built and shipped the Apple Music Extension within Facebook Messenger leveraging third-
         party and internal APIs';
@@ -199,12 +204,12 @@ class ResumeController extends Controller
         $data->task = $childCollection;
 
         $childCollection = collect();
-        
+
         $child                      = new JobAchievement;
         $child->achievement_name    = 'Architected and implemented the front-end of Apple Music embeddable web player widget,
         which lets users log in and listen to full songs in the browser';
         $childCollection->push($child);
-        
+
         $child                      = new JobAchievement;
         $child->achievement_name    = 'Contributed extensively to MusicKit.js, a JavaScript framework that allows developers to add
         an Apple Music player to their web apps';
@@ -239,7 +244,7 @@ class ResumeController extends Controller
         $childCollection->push($child);
 
         $data->achievement = $childCollection;
-        
+
         $education->push($data);
 
         // education 2
@@ -300,7 +305,7 @@ class ResumeController extends Controller
         $resume_id  = $request->resume_id;
         $title      = $request->title;
         $template   = $request->template;
-        
+
         $resume                 = Resume::where('id', $resume_id)->first();
         $resume->title          = $title;
         $resume->template_id    = $template;
@@ -315,7 +320,7 @@ class ResumeController extends Controller
     public function updateResumeStatus(Request $request) {
         $resume_id      = $request->resume_id;
         $status         = $request->status;
-        
+
         $resume             = Resume::where('id', $resume_id)->first();
         $resume->status     = $status;
 
@@ -358,12 +363,12 @@ class ResumeController extends Controller
         $job->start_month       = $start_month;
         $job->start_year        = $start_year;
         $job->currently_work    = $current;
-        
+
         if(!$current) {
             $job->end_month   = $end_month;
             $job->end_year    = $end_year;
         }
-        
+
         $job->save();
 
         // add job tasks
@@ -417,7 +422,7 @@ class ResumeController extends Controller
         $education->start_year  = $start_year;
         $education->end_month   = $end_month;
         $education->end_year    = $end_year;
-        
+
         $education->save();
 
         // add education achievements
@@ -465,13 +470,13 @@ class ResumeController extends Controller
         $job->start_month       = $start_month;
         $job->start_year        = $start_year;
         $job->currently_work    = $current;
-        
+
         // currently work 0
         if(!$current) {
             $job->end_month   = $end_month;
             $job->end_year    = $end_year;
         }
-        
+
         $job->save();
 
         // edit job tasks & achievements
@@ -483,17 +488,17 @@ class ResumeController extends Controller
             $attribute = 'job_task_id_'.$i;
 
             $task_value = $request->$attribute;
-            
+
             if($task_value!=null) {
                 $jobTask = JobTask::where('id', $task_value)->first();
             }else {
                 $jobTask            = new JobTask;
                 $jobTask->job_id    = $job_id;
             }
-            
+
             $attribute = 'job_task_'.$i;
             $jobTask->task_name = $request->$attribute;
-            
+
             if($request->$attribute!="") {
                 $jobTask->save();
                 array_push($task, $jobTask->id);
@@ -501,7 +506,7 @@ class ResumeController extends Controller
         }
 
         $allTask = JobTask::where('job_id', $job_id)->get();
-        
+
         if(count($allTask) > 0) {
             foreach($allTask as $i => $checkTask) {
                 if(!in_array($checkTask->id, $task)) {
@@ -542,7 +547,7 @@ class ResumeController extends Controller
                 }
             }
         }
-        
+
         $request->session()->flash('success', 'Job '.$company_name.' has been updated.');
         return redirect()->route('resume.view-edit-resume', $resume_id);
     }
@@ -569,7 +574,7 @@ class ResumeController extends Controller
         $education->start_year  = $start_year;
         $education->end_month   = $end_month;
         $education->end_year    = $end_year;
-        
+
         $education->save();
 
         // education achievements
@@ -590,7 +595,7 @@ class ResumeController extends Controller
             $attribute = 'education_achievement_'.$i;
 
             $educationAchievement->achievement_name = $request->$attribute;
-           
+
             if($request->$attribute!="") {
                 $educationAchievement->save();
                 array_push($achievement, $educationAchievement->id);
@@ -606,7 +611,7 @@ class ResumeController extends Controller
                 }
             }
         }
-        
+
         $request->session()->flash('success', 'Education '.$school.' has been updated.');
         return redirect()->route('resume.view-edit-resume', $resume_id);
     }
@@ -622,20 +627,20 @@ class ResumeController extends Controller
             $message    = 'Job '.$delete->company_name;
 
             $tasks = JobTask::where('job_id', $id)->get();
-            $tasks->each->delete();             
+            $tasks->each->delete();
 
             $achievements = JobAchievement::where('job_id', $id)->get();
-            $achievements->each->delete();  
+            $achievements->each->delete();
         }else {
             $delete     = Education::where('id', $id)->where('resume_id', $resume_id)->first();
             $message    = 'Education '.$delete->school;
 
             $achievements = EducationAchievement::where('education_id', $id)->get();
-            $achievements->each->delete();  
+            $achievements->each->delete();
         }
 
         $delete->delete();
-        
+
         $request->session()->flash('success', $message.' has been deleted.');
         return redirect()->route('resume.view-edit-resume', $resume_id);
     }

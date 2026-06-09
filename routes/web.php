@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 // Group routes to go through auth & verified middlewares
-Route::middleware(['auth', 'verified'])->group(function (){
+Route::middleware(['auth'])->group(function (){
     // Home page
     Route::get('/', 'App\Http\Controllers\UserController@home')->name('home');
 
@@ -50,16 +50,16 @@ Route::middleware(['auth', 'verified'])->group(function (){
 
     // Add New Job
     Route::post('/resume/add/job', 'App\Http\Controllers\ResumeController@addJob')->name('resume.add-job');
-    
+
     // Edit Job
     Route::post('/resume/edit/job', 'App\Http\Controllers\ResumeController@editJob')->name('resume.edit-job');
 
     // Add New Education
     Route::post('/resume/add/education', 'App\Http\Controllers\ResumeController@addEducation')->name('resume.add-education');
-    
+
     // Edit Education
     Route::post('/resume/edit/education', 'App\Http\Controllers\ResumeController@editEducation')->name('resume.edit-education');
-    
+
     // Delete Job/Education
     Route::post('/resume/delete/job-education', 'App\Http\Controllers\ResumeController@deleteJobEducation')->name('resume.delete-job-education');
 
