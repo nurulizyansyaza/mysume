@@ -139,11 +139,11 @@
                     </div>
                     <div class="form-group mb-3">
                         <label for="inputPassword" class="form-label ff-days-one text-dark small">{{ __('Password') }}</label>
-                        <input type="password" class="form-control main-input ff-montserrat text-dark small" id="inputPassword" name="password" required>
+                        <input type="password" class="form-control main-input ff-montserrat text-dark small" id="inputPassword" name="password" autocomplete="new-password" required>
                     </div>
                     <div class="form-group mb-3">
                         <label for="inputPassword" class="form-label ff-days-one text-dark small">{{ __('Confirm Password') }}</label>
-                        <input type="password" class="form-control main-input ff-montserrat text-dark small" id="inputConfirmPassword" name="password_confirmation" required>
+                        <input type="password" class="form-control main-input ff-montserrat text-dark small" id="inputConfirmPassword" name="password_confirmation" autocomplete="new-password" required>
                     </div>
                     <div class="d-flex justify-content-end">
                         <a href="{{ route('login') }}" class="text-decoration-none fw-bold ff-montserrat text-dark small"><span class="me-3">{{ __('Already have an account?') }}</span><svg width="16" height="11" viewBox="0 0 16 11" fill="#000000" xmlns="http://www.w3.org/2000/svg">
